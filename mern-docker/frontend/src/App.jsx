@@ -1,9 +1,9 @@
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 
-import Home from "./pages/Home";
-import Create from "./pages/Create";
+import Home from './pages/Home'
+import Create from './pages/Create'
 
-import "./App.css";
+import './App.css'
 
 function App() {
   return (
@@ -19,6 +19,9 @@ function App() {
           <Link to="/create" className="navbar_link">
             Share
           </Link>
+          <Link to="#" className="navbar_link">
+            About Me
+          </Link>
         </div>
       </nav>
 
@@ -27,7 +30,7 @@ function App() {
         <Route path="/create" element={<Create />} />
       </Routes>
     </Router>
-  );
+  )
 }
 
-export default App;
+export default App
