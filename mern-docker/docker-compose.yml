@@ -79,7 +79,7 @@ services:
     # Pada kedua layanan di atas, kita menggunakan konteks build untuk membangun image untuk layanan dari Dockerfile sehingga kita menentukan image sebagai "build: ./frontend" atau "build: ./backend".
     # tetapi untuk layanan db, kita menggunakan image dari docker hub jadi kita menentukan image sebagai "image: mongo:latest"
     # Anda dapat menemukan nama dan tag image untuk mongodb dari docker hub di sini: https://hub.docker.com/_/mongo
-    image: mongo:latest
+    image: mongo:4.4.18
 
     # tentukan port yang akan diexpose oleh layanan db
     # umumnya, kita melakukan ini dalam layanan api menggunakan mongodb atlas. Tetapi untuk tujuan demonstrasi, kita menggunakan instansi mongodb lokal
