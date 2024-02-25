@@ -1,0 +1,32 @@
+# mendefinisikan layanan/container yang akan dijalankan
+services:
+  # mendefinisikan layanan/container aplikasi
+  # kita dapat menggunakan nama apa pun untuk layanan tersebut. Di sini kita menggunakan `web`
+  # kita juga dapat membuat beberapa layanan
+  web:
+    # tentukan image untuk membangun container
+    # ini bisa menjadi image apa pun yang tersedia di docker hub atau yang kita buat sendiri
+    build:
+      # tentukan path ke Dockerfile
+      context: .
+      # tentukan nama file (opsional)
+      dockerfile: Dockerfile
+
+    # tentukan pemetaan port dari host ke container
+    # ini mirip dengan flag -p dalam perintah `docker run`
+    # port pertama adalah port pada mesin host dan yang kedua adalah port di dalam container
+    ports:
+      - 5173:5173
+
+    # tentukan volume yang akan di-mount
+    # ini memungkinkan direktori saat ini di-mount ke dalam direktori `/app` di dalam container.
+    # karena ini, setiap perubahan yang dilakukan pada file dalam direktori saat ini akan tercermin di dalam container. Ini mirip dengan flag -v dalam perintah `docker run`.
+    # bahkan jika sebuah container dihentikan atau dihapus, volume tidak dihapus dan dapat digunakan oleh container lain juga.
+    volumes:
+      # di sini, kita sedang melakukan mounting direktori saat ini ke dalam direktori `/app` di dalam container (yang merupakan direktori kerja dari container)
+      # sintaksnya adalah `<path ke direktori di host>:<path ke direktori di dalam container>`
+      # kita melakukan ini karena kita ingin mencerminkan perubahan yang dilakukan pada file dalam direktori saat ini di dalam container
+      - .:/app
+      # kita juga mount direktori node_modules di dalam container ke /app/node_modules. Hal ini dilakukan untuk menghindari instalasi node_modules di dalam container.
+      # node_modules akan diinstal di mesin host dan di-mount ke dalam container
+      - /app/node_modules
