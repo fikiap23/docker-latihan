@@ -1,0 +1,98 @@
+# tentukan versi docker-compose
+version: '3.8'
+
+# mendefinisikan layanan/container yang akan dijalankan
+services:
+  # mendefinisikan layanan frontend
+  web:
+    # kita menggunakan depends_on untuk menentukan bahwa layanan bergantung pada layanan lain
+    # dalam hal ini, kita menentukan bahwa web bergantung pada layanan api
+    # ini berarti bahwa layanan api akan dimulai sebelum layanan web
+    depends_on:
+      - api
+    # tentukan konteks build untuk layanan web
+    # ini adalah direktori di mana Dockerfile untuk layanan web berada
+    build: ./frontend
+    # tentukan port yang akan diexpose oleh layanan web
+    # angka pertama adalah port pada mesin host
+    # angka kedua adalah port di dalam container
+    ports:
+      - 5173:5173
+    # tentukan variabel lingkungan untuk layanan web
+    # variabel lingkungan ini akan tersedia di dalam container
+    environment:
+      VITE_API_URL: http://localhost:8000
+
+    # ini untuk mode watch docker compose
+    # apa pun yang disebutkan di bawah develop akan diawasi perubahannya oleh watch docker compose dan akan melakukan tindakan yang disebutkan
+    develop:
+      # kita tentukan file-file yang akan diawasi perubahannya
+      watch:
+        # ini akan memantau perubahan pada package.json dan package-lock.json dan akan membangun ulang container jika ada perubahan
+        - path: ./frontend/package.json
+          action: rebuild
+        - path: ./frontend/package-lock.json
+          action: rebuild
+        # ini akan memantau perubahan di direktori frontend dan akan menyinkronkan perubahan tersebut dengan container secara real time
+        - path: ./frontend
+          target: /app
+          action: sync
+
+  # mendefinisikan layanan/api
+  api:
+    # layanan api bergantung pada layanan db sehingga layanan db akan dimulai sebelum layanan api
+    depends_on:
+      - db
+
+    # tentukan konteks build untuk layanan api
+    build: ./backend
+
+    # tentukan port yang akan diexpose oleh layanan api
+    # angka pertama adalah port pada mesin host
+    # angka kedua adalah port di dalam container
+    ports:
+      - 8000:8000
+
+    # tentukan variabel lingkungan untuk layanan api
+    # untuk tujuan demonstrasi, kita menggunakan instansi mongodb lokal
+    environment:
+      DB_URL: mongodb://db/anime
+
+    # establish docker compose watch mode for the api service
+    develop:
+      # specify the files to watch for changes
+      watch:
+        # it'll watch for changes in package.json and package-lock.json and rebuild the container and image if there are any changes
+        - path: ./backend/package.json
+          action: rebuild
+        - path: ./backend/package-lock.json
+          action: rebuild
+
+        # it'll watch for changes in the backend directory and sync the changes with the container real time
+        - path: ./backend
+          target: /app
+          action: sync
+
+  # mendefinisikan layanan db
+  db:
+    # tentukan image yang akan digunakan untuk layanan db dari docker hub. Jika kita memiliki image kustom, kita dapat menentukan itu dalam format ini
+    # Pada kedua layanan di atas, kita menggunakan konteks build untuk membangun image untuk layanan dari Dockerfile sehingga kita menentukan image sebagai "build: ./frontend" atau "build: ./backend".
+    # tetapi untuk layanan db, kita menggunakan image dari docker hub jadi kita menentukan image sebagai "image: mongo:latest"
+    # Anda dapat menemukan nama dan tag image untuk mongodb dari docker hub di sini: https://hub.docker.com/_/mongo
+    image: mongo:latest
+
+    # tentukan port yang akan diexpose oleh layanan db
+    # umumnya, kita melakukan ini dalam layanan api menggunakan mongodb atlas. Tetapi untuk tujuan demonstrasi, kita menggunakan instansi mongodb lokal
+    # biasanya, mongodb berjalan pada port 27017. Jadi kita mengekspos port 27017 pada mesin host dan memetakkannya ke port 27017 di dalam container
+    ports:
+      - 27017:27017
+
+    # tentukan volume yang akan di-mount untuk layanan db
+    # kita memasang volume bernama "anime" di dalam container di direktori /data/db
+    # ini dilakukan agar data di dalam container mongodb dipertahankan bahkan jika container dihentikan
+    volumes:
+      - anime:/data/db
+
+# mendefinisikan volume yang akan digunakan oleh layanan
+volumes:
+  anime:
